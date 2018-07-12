@@ -17,20 +17,19 @@ func main() {
 	if !bot.Init().Success {
 		panic("init failed")
 	}
-	bot.OnQRURL = func(s string) {
+	bot.OnQRURL(func(s string) {
 		qrterminal.Generate(s, qrterminal.H, os.Stdout)
-	}
+	})
 	data := bot.QRLogin()
 	fmt.Printf("login resp data: %+v\n", data)
-	bot.OnLogin = func() {
+	bot.OnLogin(func() {
 		fmt.Println(string(bot.SyncContact().Data))
-	}
-	bot.OnMsg = func(msgList []padchat.Msg) {
+	})
+	bot.OnMsg(func(msgList []padchat.Msg) {
 		for _, v := range msgList {
 			fmt.Printf("%+v\n", v)
 			fmt.Println(strings.Repeat("=", 30))
 		}
-	}
-
+	})
 	select {}
 }

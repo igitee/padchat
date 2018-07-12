@@ -12,12 +12,13 @@ import (
 )
 
 type Bot struct {
+	sync.RWMutex
 	ws         *websocket.Conn
 	retProcMap *sync.Map
-	OnQRURL    func(string)
-	OnScan     func(resp *ScanResp)
-	OnMsg      func(msgList []Msg)
-	OnLogin    func()
+	onQRURL    func(string)
+	onScan     func(*ScanResp)
+	onMsg      func([]Msg)
+	onLogin    func()
 }
 
 type WSReq struct {
@@ -103,14 +104,7 @@ func NewBot(url string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
-	bot := &Bot{
-		ws:         conn,
-		retProcMap: &sync.Map{},
-		OnQRURL:    func(string) {},
-		OnScan:     func(*ScanResp) {},
-		OnMsg:      func([]Msg) {},
-		OnLogin:    func() {},
-	}
+	bot := newBot(conn)
 	go func() {
 		for range time.Tick(time.Millisecond * 500) {
 			data := &struct {
@@ -130,17 +124,33 @@ func NewBot(url string) (*Bot, error) {
 						URL string
 					}{}
 					json.Unmarshal(data.Data, url)
-					go bot.OnQRURL(url.URL)
+					go func() {
+						bot.RLock()
+						defer bot.RUnlock()
+						bot.onQRURL(url.URL)
+					}()
 				case "scan":
 					scan := &ScanResp{}
 					json.Unmarshal(data.Data, scan)
-					go bot.OnScan(scan)
+					go func() {
+						bot.RLock()
+						defer bot.RUnlock()
+						bot.onScan(scan)
+					}()
 				case "login":
-					go bot.OnLogin()
+					go func() {
+						bot.RLock()
+						defer bot.RUnlock()
+						bot.onLogin()
+					}()
 				case "push":
 					push := &PushResp{}
 					json.Unmarshal(data.Data, push)
-					go bot.OnMsg(push.List)
+					go func() {
+						bot.RLock()
+						defer bot.RUnlock()
+						bot.onMsg(push.List)
+					}()
 				default:
 					fmt.Println(data.Event, string(data.Data))
 					fmt.Println("=============================")
@@ -159,6 +169,42 @@ func NewBot(url string) (*Bot, error) {
 		}
 	}()
 	return bot, nil
+}
+
+func newBot(conn *websocket.Conn) *Bot {
+	return &Bot{
+		RWMutex:    sync.RWMutex{},
+		ws:         conn,
+		retProcMap: &sync.Map{},
+		onQRURL:    func(string) {},
+		onScan:     func(*ScanResp) {},
+		onMsg:      func([]Msg) {},
+		onLogin:    func() {},
+	}
+}
+
+func (b *Bot) OnQRURL(f func(string)) {
+	b.Lock()
+	defer b.Unlock()
+	b.onQRURL = f
+}
+
+func (b *Bot) OnScan(f func(resp *ScanResp)) {
+	b.Lock()
+	defer b.Unlock()
+	b.onScan = f
+}
+
+func (b *Bot) OnMsg(f func(msgList []Msg)) {
+	b.Lock()
+	defer b.Unlock()
+	b.onMsg = f
+}
+
+func (b *Bot) OnLogin(f func()) {
+	b.Lock()
+	defer b.Unlock()
+	b.onLogin = f
 }
 
 type CommandResp struct {
