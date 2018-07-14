@@ -104,6 +104,7 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 					defer bot.RUnlock()
 					bot.onMsg(*msg)
 				}()
+			case 2048:
 			default:
 				fmt.Println(string(v))
 				fmt.Println(strings.Repeat("=", 100))
@@ -131,6 +132,7 @@ func newBot(conn *websocket.Conn) *Bot {
 		onScan:     func(*ScanResp) {},
 		onMsg:      func(Msg) {},
 		onLogin:    func() {},
+		onLoaded:   func() {},
 	}
 }
 
