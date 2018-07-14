@@ -76,6 +76,13 @@ type MsgImageResp struct {
 	Status  int    `json:"status"`
 }
 
+type MsgVideoResp struct {
+	Vidro   string `json:"video"`
+	Message string `json:"message"`
+	Size    int    `json:"size"`
+	Status  int    `json:"status"`
+}
+
 type Contact struct {
 	BigHead         string `json:"big_head"`
 	BitMask         int64  `json:"bit_mask"`

@@ -130,22 +130,6 @@ func (bot *Bot) SendImage(req SendMsgReq) (*SendMsgResp, error) {
 	return data, nil
 }
 
-func (bot *Bot) GetMsgImage(rawMsgData Msg) (*MsgImageResp, error) {
-	rawMsgData.Data = ""
-	resp := bot.sendCommand("getMsgImage", struct {
-		RawMsgData Msg `json:"rawMsgData"`
-	}{RawMsgData: rawMsgData})
-	if !resp.Success {
-		return nil, errors.New(resp.Msg)
-	}
-	imgData := &MsgImageResp{}
-	err := jsoniter.Unmarshal(resp.Data, imgData)
-	if err != nil {
-		return nil, err
-	}
-	return imgData, nil
-}
-
 func (bot *Bot) GetRoomMembers(groupID string) (*ChatroomInfo, error) {
 	resp := bot.sendCommand("getRoomMembers", struct {
 		GroupID string `json:"groupId"`
@@ -180,4 +164,38 @@ func (bot *Bot) GetContact(userID string) (*Contact, error) {
 		return nil, err
 	}
 	return contact, nil
+}
+
+// mType = 3
+func (bot *Bot) GetMsgImage(rawMsgData Msg) (*MsgImageResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("getMsgImage", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+	}{RawMsgData: rawMsgData})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	imgData := &MsgImageResp{}
+	err := jsoniter.Unmarshal(resp.Data, imgData)
+	if err != nil {
+		return nil, err
+	}
+	return imgData, nil
+}
+
+// mType = 43
+func (bot *Bot) GetMsgVideo(rawMsgData Msg) (*MsgVideoResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("getMsgVideo", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+	}{RawMsgData: rawMsgData})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	videoData := &MsgVideoResp{}
+	err := jsoniter.Unmarshal(resp.Data, videoData)
+	if err != nil {
+		return nil, err
+	}
+	return videoData, nil
 }
