@@ -25,11 +25,9 @@ func main() {
 	bot.OnLogin(func() {
 		fmt.Println(string(bot.SyncContact().Data))
 	})
-	bot.OnMsg(func(msgList []padchat.Msg) {
-		for _, v := range msgList {
-			fmt.Printf("%+v\n", v)
-			fmt.Println(strings.Repeat("=", 30))
-		}
+	bot.OnMsg(func(msg padchat.Msg) {
+		fmt.Printf("%+v\n", msg)
+		fmt.Println(strings.Repeat("=", 100))
 	})
 	select {}
 }
