@@ -173,8 +173,17 @@ func (bot *Bot) GetRoomMembers(groupID string) (*ChatroomInfo, error) {
 	return chatroomInfo, nil
 }
 
-func (bot *Bot) GetContact(userID string) CommandResp {
-	return bot.sendCommand("getContact", struct {
+func (bot *Bot) GetContact(userID string) (*Contact, error) {
+	resp := bot.sendCommand("getContact", struct {
 		UserID string `json:"userId"`
 	}{UserID: userID})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	contact := &Contact{}
+	err := jsoniter.Unmarshal(resp.Data, contact)
+	if err != nil {
+		return nil, err
+	}
+	return contact, nil
 }
