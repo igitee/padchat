@@ -104,7 +104,7 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 					defer bot.RUnlock()
 					bot.onMsg(*msg)
 				}()
-			case 2048:
+			case 2048, 32768:
 			default:
 				fmt.Println(string(v))
 				fmt.Println(strings.Repeat("=", 100))
