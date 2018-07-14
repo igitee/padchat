@@ -75,3 +75,38 @@ type MsgImageResp struct {
 	Size    int    `json:"size"`
 	Status  int    `json:"status"`
 }
+
+type Contact struct {
+	BigHead         string `json:"big_head"`
+	BitMask         int64  `json:"bit_mask"`
+	BitValue        int    `json:"bit_value"`
+	ChatroomID      int    `json:"chatroom_id"`
+	ChatroomOwner   string `json:"chatroom_owner"`
+	City            string `json:"city"`
+	Continue        int    `json:"continue"`
+	Country         string `json:"country"`
+	ID              int    `json:"id"`
+	ImgFlag         int    `json:"img_flag"`
+	Intro           string `json:"intro"`
+	Label           string `json:"label"`
+	Level           int    `json:"level"`
+	Member          string `json:"member"`
+	MaxMemberCount  int    `json:"max_member_count"`
+	MemberCount     int    `json:"member_count"`
+	MsgType         int    `json:"msg_type"`
+	NickName        string `json:"nick_name"`
+	Provincia       string `json:"provincia"`
+	PyInitial       string `json:"py_initial"`
+	QuanPin         string `json:"quan_pin"`
+	Remark          string `json:"remark"`
+	RemarkPyInitial string `json:"remark_py_initial"`
+	RemarkQuanPin   string `json:"remark_quan_pin"`
+	Sex             int    `json:"sex"`
+	Signature       string `json:"signature"`
+	SmallHead       string `json:"small_head"`
+	Source          int    `json:"source"`
+	Status          int    `json:"status"`
+	Stranger        string `json:"stranger"`
+	Uin             int    `json:"uin"`
+	UserName        string `json:"user_name"`
+}

@@ -14,13 +14,14 @@ import (
 
 type Bot struct {
 	sync.RWMutex
-	ws         *websocket.Conn
-	retProcMap *sync.Map
-	onQRURL    func(string)
-	onScan     func(*ScanResp)
-	onMsg      func(Msg)
-	onLogin    func()
-	onLoaded   func()
+	ws            *websocket.Conn
+	retProcMap    *sync.Map
+	onQRURL       func(string)
+	onScan        func(ScanResp)
+	onMsg         func(Msg)
+	onLogin       func()
+	onLoaded      func()
+	onContactSync func(Contact)
 }
 
 //NewBot create new Bot instance
@@ -76,8 +77,8 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 			bot.onQRURL(url.URL)
 		}()
 	case "scan":
-		scan := &ScanResp{}
-		json.Unmarshal(data.Data, scan)
+		var scan ScanResp
+		json.Unmarshal(data.Data, &scan)
 		go func() {
 			bot.RLock()
 			defer bot.RUnlock()
@@ -96,13 +97,21 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 			msgType := jsoniter.Get(v, "msg_type").ToInt()
 			switch msgType {
 			case 5:
-				msg := &Msg{}
-				json.Unmarshal(v, msg)
+				var msg Msg
+				jsoniter.Unmarshal(v, &msg)
 				msg.MType = msg.SubType
 				go func() {
 					bot.RLock()
 					defer bot.RUnlock()
-					bot.onMsg(*msg)
+					bot.onMsg(msg)
+				}()
+			case 2:
+				var contact Contact
+				jsoniter.Unmarshal(v, &contact)
+				go func() {
+					bot.RLock()
+					defer bot.RUnlock()
+					bot.onContactSync(contact)
 				}()
 			case 2048, 32768:
 			default:
@@ -125,14 +134,15 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 
 func newBot(conn *websocket.Conn) *Bot {
 	return &Bot{
-		RWMutex:    sync.RWMutex{},
-		ws:         conn,
-		retProcMap: &sync.Map{},
-		onQRURL:    func(string) {},
-		onScan:     func(*ScanResp) {},
-		onMsg:      func(Msg) {},
-		onLogin:    func() {},
-		onLoaded:   func() {},
+		RWMutex:       sync.RWMutex{},
+		ws:            conn,
+		retProcMap:    &sync.Map{},
+		onQRURL:       func(string) {},
+		onScan:        func(ScanResp) {},
+		onMsg:         func(Msg) {},
+		onLogin:       func() {},
+		onLoaded:      func() {},
+		onContactSync: func(Contact) {},
 	}
 }
 
@@ -142,13 +152,13 @@ func (bot *Bot) OnQRURL(f func(string)) {
 	bot.onQRURL = f
 }
 
-func (bot *Bot) OnScan(f func(resp *ScanResp)) {
+func (bot *Bot) OnScan(f func(resp ScanResp)) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onScan = f
 }
 
-func (bot *Bot) OnMsg(f func(msgList Msg)) {
+func (bot *Bot) OnMsg(f func(msg Msg)) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onMsg = f
@@ -164,4 +174,10 @@ func (bot *Bot) OnLoaded(f func()) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onLoaded = f
+}
+
+func (bot *Bot) OnContactSync(f func(contact Contact)) {
+	bot.Lock()
+	defer bot.Unlock()
+	bot.onContactSync = f
 }
