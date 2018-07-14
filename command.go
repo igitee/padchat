@@ -234,3 +234,133 @@ func (bot *Bot) CreateRoom(userList []string) (*CreateRoomResp, error) {
 	}
 	return data, nil
 }
+
+func (bot *Bot) AddRoomMember(groupID, userID string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("addRoomMember", struct {
+		GroupID string `json:"groupId"`
+		UserID  string `json:"userId"`
+	}{
+		GroupID: groupID,
+		UserID:  userID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) InviteRoomMember(groupID, userID string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("inviteRoomMember", struct {
+		GroupID string `json:"groupId"`
+		UserID  string `json:"userId"`
+	}{
+		GroupID: groupID,
+		UserID:  userID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) DeleteRoomMember(groupID, userID string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("deleteRoomMember", struct {
+		GroupID string `json:"groupId"`
+		UserID  string `json:"userId"`
+	}{
+		GroupID: groupID,
+		UserID:  userID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SetRoomAnnouncement(groupID, content string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("setRoomAnnouncement", struct {
+		GroupID string `json:"groupId"`
+		Content string `json:"content"`
+	}{
+		GroupID: groupID,
+		Content: content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SetRoomName(groupID, content string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("setRoomName", struct {
+		GroupID string `json:"groupId"`
+		Content string `json:"content"`
+	}{
+		GroupID: groupID,
+		Content: content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) QuitRoom(groupID string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("quitRoom", struct {
+		GroupID string `json:"groupId"`
+	}{
+		GroupID: groupID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) GetRoomQRCode(groupID string) (*RoomQRCodeResp, error) {
+	resp := bot.sendCommand("getRoomQrcode", struct {
+		GroupID string `json:"groupId"`
+		Style   int    `json:"style"`
+	}{
+		GroupID: groupID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &RoomQRCodeResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}

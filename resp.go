@@ -149,3 +149,15 @@ type CreateRoomResp struct {
 	Status   int    `json:"status"`
 	UserName string `json:"user_name"`
 }
+
+type MsgAndStatus struct {
+	Message string `json:"message"`
+	Status  int    `json:"status"`
+}
+
+type RoomQRCodeResp struct {
+	Footer  string `json:"footer"`
+	Message string `json:"message"`
+	QRCode  string `json:"qr_code"`
+	Status  int    `json:"status"`
+}
