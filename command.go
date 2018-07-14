@@ -1,10 +1,11 @@
 package padchat
 
 import (
-	"encoding/json"
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
+	"github.com/json-iterator/go"
 )
 
 func (bot *Bot) sendCommand(cmd string, data interface{}) CommandResp {
@@ -13,7 +14,12 @@ func (bot *Bot) sendCommand(cmd string, data interface{}) CommandResp {
 	bot.retProcMap.Store(id, func(resp CommandResp) {
 		c <- resp
 	})
-	bot.ws.WriteJSON(WSReq{Type: "user", CMD: cmd, CMDID: id, Data: data})
+	w, _ := bot.ws.NextWriter(websocket.TextMessage)
+	v := WSReq{Type: "user", CMD: cmd, CMDID: id, Data: data}
+	encoder := jsoniter.NewEncoder(w)
+	encoder.SetEscapeHTML(false)
+	encoder.Encode(v)
+	w.Close()
 	return <-c
 }
 
@@ -67,7 +73,7 @@ func (bot *Bot) GetWXData() (string, error) {
 	if !resp.Success {
 		return "", errors.New(resp.Msg)
 	}
-	err := json.Unmarshal(resp.Data, data)
+	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return "", err
 	}
@@ -80,7 +86,7 @@ func (bot *Bot) GetLoginToken() (*LoginTokenResp, error) {
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	err := json.Unmarshal(resp.Data, data)
+	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +99,7 @@ func (bot *Bot) GetMyInfo() (*MyInfoResp, error) {
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	err := json.Unmarshal(resp.Data, data)
+	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +116,7 @@ func (bot *Bot) SendMsg(req SendMsgReq) (*SendMsgResp, error) {
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	err := json.Unmarshal(resp.Data, data)
+	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err
 	}
@@ -123,11 +129,27 @@ func (bot *Bot) SendImage(req SendMsgReq) (*SendMsgResp, error) {
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	err := json.Unmarshal(resp.Data, data)
+	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err
 	}
 	return data, nil
+}
+
+func (bot *Bot) GetMsgImage(rawMsgData Msg) (*MsgImageResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("getMsgImage", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+	}{RawMsgData: rawMsgData})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	imgData := &MsgImageResp{}
+	err := jsoniter.Unmarshal(resp.Data, imgData)
+	if err != nil {
+		return nil, err
+	}
+	return imgData, nil
 }
 
 func (bot *Bot) GetRoomMembers(groupID string) CommandResp {

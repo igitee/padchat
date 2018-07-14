@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"github.com/json-iterator/go"
 )
 
 type Bot struct {
@@ -17,7 +18,7 @@ type Bot struct {
 	retProcMap *sync.Map
 	onQRURL    func(string)
 	onScan     func(*ScanResp)
-	onMsg      func([]Msg)
+	onMsg      func(Msg)
 	onLogin    func()
 	onLoaded   func()
 }
@@ -90,12 +91,25 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 		}()
 	case "push":
 		push := &PushResp{}
-		json.Unmarshal(data.Data, push)
-		go func() {
-			bot.RLock()
-			defer bot.RUnlock()
-			bot.onMsg(push.List)
-		}()
+		jsoniter.Unmarshal(data.Data, push)
+		for _, v := range push.List {
+			msgType := jsoniter.Get(v, "msg_type").ToInt()
+			switch msgType {
+			case 5:
+				msg := &Msg{}
+				json.Unmarshal(v, msg)
+				msg.MType = msg.SubType
+				go func() {
+					bot.RLock()
+					defer bot.RUnlock()
+					bot.onMsg(*msg)
+				}()
+			default:
+				fmt.Println(string(v))
+				fmt.Println(strings.Repeat("=", 100))
+			}
+		}
+
 	case "loaded":
 		go func() {
 			bot.RLock()
@@ -115,7 +129,7 @@ func newBot(conn *websocket.Conn) *Bot {
 		retProcMap: &sync.Map{},
 		onQRURL:    func(string) {},
 		onScan:     func(*ScanResp) {},
-		onMsg:      func([]Msg) {},
+		onMsg:      func(Msg) {},
 		onLogin:    func() {},
 	}
 }
@@ -132,7 +146,7 @@ func (bot *Bot) OnScan(f func(resp *ScanResp)) {
 	bot.onScan = f
 }
 
-func (bot *Bot) OnMsg(f func(msgList []Msg)) {
+func (bot *Bot) OnMsg(f func(msgList Msg)) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onMsg = f

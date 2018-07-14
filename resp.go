@@ -27,50 +27,24 @@ type ScanResp struct {
 }
 
 type PushResp struct {
-	List []Msg `json:"list"`
+	List []json.RawMessage `json:"list"`
 }
 
 type Msg struct {
-	Data            string `json:"data"`
-	Content         string `json:"content"`
-	Description     string `json:"description"`
-	FromUser        string `json:"from_user"`
-	MsgID           string `json:"msg_id"`
-	MsgSource       string `json:"msg_source"`
-	SubType         int    `json:"sub_type"`
-	Timestamp       int    `json:"timestamp"`
-	ToUser          string `json:"to_user"`
-	Continue        int    `json:"continue"`
-	MsgType         int    `json:"msg_type"`
-	Status          int    `json:"status"`
-	Uin             int    `json:"uin"`
-	BigHead         string `json:"big_head,omitempty"`
-	BitMask         int64  `json:"bit_mask,omitempty"`
-	BitValue        int    `json:"bit_value,omitempty"`
-	ChatroomID      int    `json:"chatroom_id,omitempty"`
-	ChatroomOwner   string `json:"chatroom_owner,omitempty"`
-	City            string `json:"city,omitempty"`
-	Country         string `json:"country,omitempty"`
-	ID              int    `json:"id,omitempty"`
-	ImgFlag         int    `json:"img_flag,omitempty"`
-	Intro           string `json:"intro,omitempty"`
-	Label           string `json:"label,omitempty"`
-	Level           int    `json:"level,omitempty"`
-	MaxMemberCount  int    `json:"max_member_count,omitempty"`
-	MemberCount     int    `json:"member_count,omitempty"`
-	NickName        string `json:"nick_name,omitempty"`
-	Provincia       string `json:"provincia,omitempty"`
-	PyInitial       string `json:"py_initial,omitempty"`
-	QuanPin         string `json:"quan_pin,omitempty"`
-	Remark          string `json:"remark,omitempty"`
-	RemarkPyInitial string `json:"remark_py_initial,omitempty"`
-	RemarkQuanPin   string `json:"remark_quan_pin,omitempty"`
-	Sex             int    `json:"sex,omitempty"`
-	Signature       string `json:"signature,omitempty"`
-	SmallHead       string `json:"small_head,omitempty"`
-	Source          int    `json:"source,omitempty"`
-	Stranger        string `json:"stranger,omitempty"`
-	UserName        string `json:"user_name,omitempty"`
+	Data        string          `json:"data,omitempty"`
+	Content     json.RawMessage `json:"content"`
+	Continue    int             `json:"continue"`
+	Description string          `json:"description"`
+	Status      int             `json:"status"`
+	Timestamp   int             `json:"timestamp"`
+	Uin         int             `json:"uin"`
+	FromUser    string          `json:"from_user"`
+	MsgID       string          `json:"msg_id"`
+	MsgSource   string          `json:"msg_source"`
+	MsgType     int             `json:"msg_type"`
+	SubType     int             `json:"sub_type"`
+	ToUser      string          `json:"to_user"`
+	MType       int             `json:"m_type"`
 }
 
 type CommandResp struct {
@@ -92,5 +66,12 @@ type MyInfoResp struct {
 type SendMsgResp struct {
 	Message string `json:"message"`
 	MsgID   string `json:"msg_id"`
+	Status  int    `json:"status"`
+}
+
+type MsgImageResp struct {
+	Image   string `json:"image"`
+	Message string `json:"message"`
+	Size    int    `json:"size"`
 	Status  int    `json:"status"`
 }
