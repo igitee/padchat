@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 	"github.com/json-iterator/go"
 )
 
@@ -14,12 +13,7 @@ func (bot *Bot) sendCommand(cmd string, data interface{}) CommandResp {
 	bot.retProcMap.Store(id, func(resp CommandResp) {
 		c <- resp
 	})
-	w, _ := bot.ws.NextWriter(websocket.TextMessage)
-	v := WSReq{Type: "user", CMD: cmd, CMDID: id, Data: data}
-	encoder := jsoniter.NewEncoder(w)
-	encoder.SetEscapeHTML(false)
-	encoder.Encode(v)
-	w.Close()
+	bot.ws.WriteJSON(WSReq{Type: "user", CMD: cmd, CMDID: id, Data: data})
 	return <-c
 }
 

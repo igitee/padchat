@@ -14,7 +14,7 @@ import (
 
 type Bot struct {
 	sync.RWMutex
-	ws            *websocket.Conn
+	ws            WSConn
 	retProcMap    *sync.Map
 	onQRURL       func(string)
 	onScan        func(ScanResp)
@@ -22,6 +22,28 @@ type Bot struct {
 	onLogin       func()
 	onLoaded      func()
 	onContactSync func(Contact)
+}
+
+type WSConn struct {
+	sync.Mutex
+	*websocket.Conn
+}
+
+func (c *WSConn) WriteJSON(v interface{}) error {
+	c.Lock()
+	defer c.Unlock()
+	w, err := c.NextWriter(websocket.TextMessage)
+	if err != nil {
+		return err
+	}
+	encoder := jsoniter.NewEncoder(w)
+	encoder.SetEscapeHTML(false)
+	err1 := encoder.Encode(v)
+	err2 := w.Close()
+	if err1 != nil {
+		return err1
+	}
+	return err2
 }
 
 //NewBot create new Bot instance
@@ -134,8 +156,11 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 
 func newBot(conn *websocket.Conn) *Bot {
 	return &Bot{
-		RWMutex:       sync.RWMutex{},
-		ws:            conn,
+		RWMutex: sync.RWMutex{},
+		ws: WSConn{
+			Mutex: sync.Mutex{},
+			Conn:  conn,
+		},
 		retProcMap:    &sync.Map{},
 		onQRURL:       func(string) {},
 		onScan:        func(ScanResp) {},
