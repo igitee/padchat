@@ -217,3 +217,20 @@ func (bot *Bot) GetMsgVoice(rawMsgData Msg) (*MsgVoiceResp, error) {
 	return voiceData, nil
 }
 
+func (bot *Bot) CreateRoom(userList []string) (*CreateRoomResp, error) {
+	resp := bot.sendCommand("createRoom", struct {
+		UserList []string `json:"userList"`
+	}{UserList: userList})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &CreateRoomResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	if data.UserName == "" {
+		return nil, errors.New(data.Message)
+	}
+	return data, nil
+}

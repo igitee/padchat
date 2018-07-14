@@ -143,3 +143,9 @@ type ChatMemberInfo struct {
 	SmallHead        string `json:"small_head"`
 	UserName         string `json:"user_name"`
 }
+
+type CreateRoomResp struct {
+	Message  string `json:"message"`
+	Status   int    `json:"status"`
+	UserName string `json:"user_name"`
+}
