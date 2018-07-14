@@ -110,3 +110,22 @@ type Contact struct {
 	Uin             int    `json:"uin"`
 	UserName        string `json:"user_name"`
 }
+
+type ChatroomInfo struct {
+	ChatroomID int              `json:"chatroom_id"`
+	Count      int              `json:"count"`
+	Member     string           `json:"member"`
+	Members    []ChatMemberInfo `json:"-"`
+	Message    string           `json:"message"`
+	Status     int              `json:"status"`
+	UserName   string           `json:"user_name"`
+}
+
+type ChatMemberInfo struct {
+	BigHead          string `json:"big_head"`
+	ChatroomNickName string `json:"chatroom_nick_name"`
+	InvitedBy        string `json:"invited_by"`
+	NickName         string `json:"nick_name"`
+	SmallHead        string `json:"small_head"`
+	UserName         string `json:"user_name"`
+}

@@ -152,10 +152,25 @@ func (bot *Bot) GetMsgImage(rawMsgData Msg) (*MsgImageResp, error) {
 	return imgData, nil
 }
 
-func (bot *Bot) GetRoomMembers(groupID string) CommandResp {
-	return bot.sendCommand("getRoomMembers", struct {
+func (bot *Bot) GetRoomMembers(groupID string) (*ChatroomInfo, error) {
+	resp := bot.sendCommand("getRoomMembers", struct {
 		GroupID string `json:"groupId"`
 	}{GroupID: groupID})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	chatroomInfo := &ChatroomInfo{}
+	err := jsoniter.Unmarshal(resp.Data, chatroomInfo)
+	if err != nil {
+		return nil, err
+	}
+	var ms []ChatMemberInfo
+	err = jsoniter.Unmarshal([]byte(chatroomInfo.Member), &ms)
+	if err != nil {
+		return nil, err
+	}
+	chatroomInfo.Members = ms
+	return chatroomInfo, nil
 }
 
 func (bot *Bot) GetContact(userID string) CommandResp {
