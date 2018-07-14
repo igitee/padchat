@@ -77,7 +77,14 @@ type MsgImageResp struct {
 }
 
 type MsgVideoResp struct {
-	Vidro   string `json:"video"`
+	Video   string `json:"video"`
+	Message string `json:"message"`
+	Size    int    `json:"size"`
+	Status  int    `json:"status"`
+}
+
+type MsgVoiceResp struct {
+	Voice   string `json:"voice"`
 	Message string `json:"message"`
 	Size    int    `json:"size"`
 	Status  int    `json:"status"`

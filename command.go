@@ -199,3 +199,21 @@ func (bot *Bot) GetMsgVideo(rawMsgData Msg) (*MsgVideoResp, error) {
 	}
 	return videoData, nil
 }
+
+// mType = 34
+func (bot *Bot) GetMsgVoice(rawMsgData Msg) (*MsgVoiceResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("getMsgVoice", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+	}{RawMsgData: rawMsgData})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	voiceData := &MsgVoiceResp{}
+	err := jsoniter.Unmarshal(resp.Data, voiceData)
+	if err != nil {
+		return nil, err
+	}
+	return voiceData, nil
+}
+
