@@ -347,7 +347,7 @@ func (bot *Bot) QuitRoom(groupID string) (*MsgAndStatus, error) {
 	return data, nil
 }
 
-func (bot *Bot) GetRoomQRCode(groupID string) (*RoomQRCodeResp, error) {
+func (bot *Bot) GetRoomQRCode(groupID string) (*QRCodeResp, error) {
 	resp := bot.sendCommand("getRoomQrcode", struct {
 		GroupID string `json:"groupId"`
 		Style   int    `json:"style"`
@@ -357,7 +357,176 @@ func (bot *Bot) GetRoomQRCode(groupID string) (*RoomQRCodeResp, error) {
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	data := &RoomQRCodeResp{}
+	data := &QRCodeResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SearchContact(userID string) (*Contact, error) {
+	resp := bot.sendCommand("searchContact", struct {
+		UserID string `json:"userId"`
+	}{
+		UserID: userID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &Contact{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) DeleteContact(userID string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("deleteContact", struct {
+		UserID string `json:"userId"`
+	}{
+		UserID: userID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) GetUserQRCode(userID string, style int) (*QRCodeResp, error) {
+	resp := bot.sendCommand("getRoomQrcode", struct {
+		UserID string `json:"userId"`
+		Style  int    `json:"style"`
+	}{
+		UserID: userID,
+		Style:  style,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &QRCodeResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) AcceptUser(stranger, ticket string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("acceptUser", struct {
+		Stranger string `json:"stranger"`
+		Ticket   string `json:"ticket"`
+	}{
+		Stranger: stranger,
+		Ticket:   ticket,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) AddContact(stranger, ticket, content string, Type int) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("addContact", struct {
+		Stranger string `json:"stranger"`
+		Ticket   string `json:"ticket"`
+		Type     int    `json:"type"`
+		Content  string `json:"content"`
+	}{
+		Stranger: stranger,
+		Ticket:   ticket,
+		Type:     Type,
+		Content:  content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SayHello(stranger, ticket, content string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("sayHello", struct {
+		Stranger string `json:"stranger"`
+		Ticket   string `json:"ticket"`
+		Content  string `json:"content"`
+	}{
+		Stranger: stranger,
+		Ticket:   ticket,
+		Content:  content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SetRemark(userID, remark string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("setRemark", struct {
+		UserID string `json:"userId"`
+		Remark string `json:"remark"`
+	}{
+		UserID: userID,
+		Remark: remark,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SetHeadImg(file string) (*ImgResp, error) {
+	resp := bot.sendCommand("setHeadImg", struct {
+		File string `json:"file"`
+	}{
+		File: file,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &ImgResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SNSUpload(file string) (*ImgResp, error) {
+	resp := bot.sendCommand("snsUpload", struct {
+		File string `json:"file"`
+	}{
+		File: file,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &ImgResp{}
 	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err

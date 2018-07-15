@@ -155,9 +155,18 @@ type MsgAndStatus struct {
 	Status  int    `json:"status"`
 }
 
-type RoomQRCodeResp struct {
+type QRCodeResp struct {
 	Footer  string `json:"footer"`
 	Message string `json:"message"`
 	QRCode  string `json:"qr_code"`
 	Status  int    `json:"status"`
+}
+
+type ImgResp struct {
+	BigHead   string `json:"big_url"`
+	SmallHead string `json:"small_url"`
+	Status    int    `json:"status"`
+	Size      int    `json:"size"`
+	Message   string `json:"message"`
+	Data      int    `json:"data"`
 }

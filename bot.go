@@ -3,6 +3,7 @@ package padchat
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 	"sync"
 	"time"
@@ -48,7 +49,9 @@ func (c *WSConn) WriteJSON(v interface{}) error {
 
 //NewBot create new Bot instance
 func NewBot(url string) (*Bot, error) {
-	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
+	dialer := websocket.DefaultDialer
+	dialer.WriteBufferSize = math.MaxInt32
+	conn, _, err := dialer.Dial(url, nil)
 	if err != nil {
 		return nil, err
 	}
