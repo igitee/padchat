@@ -280,3 +280,32 @@ type LabelListResp struct {
 	Message string  `json:"message"`
 	Status  int     `json:"status"`
 }
+
+type RedPacketResp struct {
+	External string `json:"external"`
+	Key      string `json:"key"`
+	Message  string `json:"message"`
+	Status   int    `json:"status"`
+}
+
+type SearchMPResp struct {
+	Code    int    `json:"code"`
+	Info    string `json:"info"`
+	Message string `json:"message"`
+	Offset  int    `json:"offset"`
+	Status  int    `json:"status"`
+}
+
+type RequestTokenResp struct {
+	FullURL  string `json:"full_url"`
+	Info     string `json:"info"`
+	Message  string `json:"message"`
+	ShareURL string `json:"share_url"`
+	Status   int    `json:"status"`
+}
+
+type RequestUrlResp struct {
+	Status   int    `json:"status"`
+	Message  string `json:"message"`
+	Response string `json:"response"`
+}

@@ -100,6 +100,10 @@ func (bot *Bot) GetMyInfo() (*MyInfoResp, error) {
 	return data, nil
 }
 
+func (bot *Bot) Logout() CommandResp {
+	return bot.sendCommand("logout", nil)
+}
+
 func (bot *Bot) SyncContact() CommandResp {
 	return bot.sendCommand("syncContact", nil)
 }
@@ -107,6 +111,27 @@ func (bot *Bot) SyncContact() CommandResp {
 func (bot *Bot) SendMsg(req SendMsgReq) (*SendMsgResp, error) {
 	data := &SendMsgResp{}
 	resp := bot.sendCommand("sendMsg", req)
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) ShareCard(toUserName, content, userId string) (*SendMsgResp, error) {
+	data := &SendMsgResp{}
+	resp := bot.sendCommand("shareCard", struct {
+		ToUserName string `json:"toUserName"`
+		Content    string `json:"content"`
+		UserID     string `json:"userId"`
+	}{
+		ToUserName: toUserName,
+		Content:    content,
+		UserID:     userId,
+	})
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
@@ -792,6 +817,158 @@ func (bot *Bot) SetLabel(userID string, labelID int) (*MsgAndStatus, error) {
 		return nil, errors.New(resp.Msg)
 	}
 	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// mType = 49
+func (bot *Bot) ReceiveRedPacket(rawMsgData Msg) (*RedPacketResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("receiveRedPacket", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+	}{RawMsgData: rawMsgData})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &RedPacketResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) QueryRedPacket(rawMsgData Msg, index int) (*RedPacketResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("queryRedPacket", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+		Index      int `json:"index"`
+	}{
+		Index:      index,
+		RawMsgData: rawMsgData,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &RedPacketResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) OpenRedPacket(rawMsgData Msg, key string) (*RedPacketResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("openRedPacket", struct {
+		RawMsgData Msg    `json:"rawMsgData"`
+		Key        string `json:"key"`
+	}{
+		Key:        key,
+		RawMsgData: rawMsgData,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &RedPacketResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SearchMp(content string) (*SearchMPResp, error) {
+	resp := bot.sendCommand("searchMp", struct {
+		Content string `json:"content"`
+	}{
+		Content: content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &SearchMPResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) GetSubscriptionInfo(ghName string) (*SearchMPResp, error) {
+	resp := bot.sendCommand("getSubscriptionInfo", struct {
+		GhName string `json:"ghName"`
+	}{
+		GhName: ghName,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &SearchMPResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) OperateSubscription(ghName string, menuId int, menuKey string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("operateSubscription", struct {
+		GhName  string `json:"ghName"`
+		MenuID  int    `json:"menuId"`
+		MenuKey string `json:"menuKey"`
+	}{
+		GhName:  ghName,
+		MenuID:  menuId,
+		MenuKey: menuKey,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) GetRequestToken(ghName, url string) (*RequestTokenResp, error) {
+	resp := bot.sendCommand("getRequestToken", struct {
+		GhName string `json:"ghName"`
+		URL    string `json:"url"`
+	}{
+		GhName: ghName,
+		URL:    url,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &RequestTokenResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) RequestUrl(url, xKey, xUin string) (*RequestUrlResp, error) {
+	resp := bot.sendCommand("requestUrl", struct {
+		URL  string `json:"url"`
+		XKey string `json:"xKey"`
+		XUin string `json:"xUin"`
+	}{
+		URL:  url,
+		XKey: xKey,
+		XUin: xUin,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &RequestUrlResp{}
 	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err
