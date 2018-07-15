@@ -21,6 +21,10 @@ func (bot *Bot) Init() CommandResp {
 	return bot.sendCommand("init", nil)
 }
 
+func (bot *Bot) Close() CommandResp {
+	return bot.sendCommand("close", nil)
+}
+
 func (bot *Bot) QRLogin() CommandResp {
 	return bot.sendCommand("login", LoginReq{LoginType: "qrcode"})
 }
