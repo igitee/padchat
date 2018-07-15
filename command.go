@@ -533,3 +533,268 @@ func (bot *Bot) SNSUpload(file string) (*ImgResp, error) {
 	}
 	return data, nil
 }
+
+// TODO: 更友好的封装
+// type - 操作类型，1为删除朋友圈，4为删除评论，5为取消赞
+// commentType - 操作类型，当删除评论时可用，需与评论type字段一致
+func (bot *Bot) SNSObjectOperation(momentID, commentID string,
+	Type, commentType int) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("snsobjectOp", struct {
+		MomentID    string `json:"momentId"`
+		Type        int    `json:"type"`
+		CommentID   string
+		CommentType int `json:"commentType"`
+	}{
+		MomentID:    momentID,
+		Type:        Type,
+		CommentID:   commentID,
+		CommentType: commentType,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// content - 文本内容或 TimeLineObject 结构体文本
+func (bot *Bot) SNSSendMoment(content string) (*MomentResp, error) {
+	resp := bot.sendCommand("snsSendMoment", struct {
+		Content string `json:"content"`
+	}{
+		Content: content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MomentResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SNSUserPage(userID, momentID string) (*MomentListResp, error) {
+	resp := bot.sendCommand("snsUserPage", struct {
+		UserID   string `json:"userId"`
+		MomentID string `json:"momentId"`
+	}{
+		UserID:   userID,
+		MomentID: momentID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MomentListResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SNSTimeline(momentID string) (*MomentListResp, error) {
+	resp := bot.sendCommand("snsTimeline", struct {
+		MomentID string `json:"momentId"`
+	}{
+		MomentID: momentID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MomentListResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SNSGetObject(momentID string) (*MomentDetailResp, error) {
+	resp := bot.sendCommand("snsGetObject", struct {
+		MomentID string `json:"momentId"`
+	}{
+		MomentID: momentID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MomentDetailResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SNSComment(userID, momentID, content string) (*MomentDetailResp, error) {
+	resp := bot.sendCommand("snsComment", struct {
+		UserID   string `json:"userId"`
+		MomentID string `json:"momentId"`
+		Content  string `json:"content"`
+	}{
+		UserID:   userID,
+		MomentID: momentID,
+		Content:  content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MomentDetailResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SNSLike(userID, momentID string) (*MomentDetailResp, error) {
+	resp := bot.sendCommand("snsLike", struct {
+		UserID   string `json:"userId"`
+		MomentID string `json:"momentId"`
+	}{
+		UserID:   userID,
+		MomentID: momentID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MomentDetailResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SyncFav(favKey string) (*FavListResp, error) {
+	resp := bot.sendCommand("syncFav", struct {
+		FavKey string `json:"favKey"`
+	}{
+		FavKey: favKey,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &FavListResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) AddFav(content string) (*AddFavResp, error) {
+	resp := bot.sendCommand("addFav", struct {
+		Content string `json:"content"`
+	}{
+		Content: content,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &AddFavResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) GetFav(favID int) (*FavResp, error) {
+	resp := bot.sendCommand("getFav", struct {
+		FavID int `json:"favId"`
+	}{
+		FavID: favID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &FavResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) DeleteFav(favID int) (*FavResp, error) {
+	resp := bot.sendCommand("deleteFav", struct {
+		FavID int `json:"favId"`
+	}{
+		FavID: favID,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &FavResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) GetLabelList() (*LabelListResp, error) {
+	resp := bot.sendCommand("getLabelList", nil)
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &LabelListResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) AddLabel(label string) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("addLabel", struct {
+		Label string `json:"label"`
+	}{Label: label})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) DeleteLabel(labelID int) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("deleteLabel", struct {
+		LabelID int `json:"labelId"`
+	}{LabelID: labelID})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (bot *Bot) SetLabel(userID string, labelID int) (*MsgAndStatus, error) {
+	resp := bot.sendCommand("setLabel", struct {
+		LabelID int    `json:"labelId"`
+		UserID  string `json:"userId"`
+	}{LabelID: labelID})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &MsgAndStatus{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}

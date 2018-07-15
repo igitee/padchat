@@ -170,3 +170,113 @@ type ImgResp struct {
 	Message   string `json:"message"`
 	Data      int    `json:"data"`
 }
+
+type Moment struct {
+	CreateTime  int    `json:"create_time"`
+	Description string `json:"description"`
+	ID          string `json:"id"`
+	NickName    string `json:"nick_name"`
+	UserName    string `json:"user_name"`
+}
+
+type MomentResp struct {
+	Data    Moment `json:"data"`
+	Message string `json:"message"`
+	Status  int    `json:"status"`
+}
+
+type MomentListResp struct {
+	Bgi     string   `json:"bgi"`
+	Data    []Moment `json:"data"`
+	Message string   `json:"message"`
+	Page    string   `json:"page"`
+	Status  int      `json:"status"`
+}
+
+type MomentComment struct {
+	CommentFlag   int    `json:"comment_flag"`
+	Content       string `json:"content"`
+	CreateTime    int    `json:"create_time"`
+	DeleteFlag    int    `json:"delete_flag"`
+	ID            int    `json:"id"`
+	NickName      string `json:"nick_name"`
+	ReplyID       int    `json:"reply_id"`
+	ReplyUserName string `json:"reply_user_name"`
+	Source        int    `json:"source"`
+	Type          int    `json:"type"`
+	UserName      string `json:"user_name"`
+}
+
+type MomentLike struct {
+	Content    string `json:"content"`
+	CreateTime int    `json:"create_time"`
+	ID         int    `json:"id"`
+	NickName   string `json:"nick_name"`
+	Type       int    `json:"type"`
+	UserName   string `json:"user_name"`
+}
+
+type MomentDetail struct {
+	Comment     []MomentComment `json:"comment"`
+	CreateTime  int             `json:"create_time"`
+	Description string          `json:"description"`
+	ID          string          `json:"id"`
+	Like        []MomentLike    `json:"like"`
+	NickName    string          `json:"nick_name"`
+	UserName    string          `json:"user_name"`
+}
+
+type MomentDetailResp struct {
+	Data    MomentDetail `json:"data"`
+	Message string       `json:"message"`
+	Status  int          `json:"status"`
+}
+
+type Fav struct {
+	Flag int `json:"flag"`
+	ID   int `json:"id"`
+	Seq  int `json:"seq"`
+	Time int `json:"time"`
+	Type int `json:"type"`
+}
+
+type FavListResp struct {
+	Continue int    `json:"continue"`
+	Data     []Fav  `json:"data"`
+	Key      string `json:"key"`
+	Message  string `json:"message"`
+	Status   int    `json:"status"`
+}
+
+type AddFavResp struct {
+	ID      int    `json:"id"`
+	Message string `json:"message"`
+	Seq     int    `json:"seq"`
+	Status  int    `json:"status"`
+}
+
+type FavDetail struct {
+	Flag   int    `json:"flag"`
+	ID     int    `json:"id"`
+	Object string `json:"object"`
+	Seq    int    `json:"seq"`
+	Status int    `json:"status"`
+	Time   int    `json:"time"`
+}
+
+type FavResp struct {
+	Data    []FavDetail `json:"data"`
+	Message string      `json:"message"`
+	Status  int         `json:"status"`
+}
+
+type Label struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type LabelListResp struct {
+	Label   []Label `json:"label"`
+	Message string  `json:"message"`
+	Status  int     `json:"status"`
+}
