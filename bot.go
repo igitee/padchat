@@ -25,7 +25,8 @@ type Bot struct {
 	onContactSync func(Contact)
 }
 
-//NewBot create new Bot instance
+// NewBot 乃万物之始
+// 新建 Bot 实例, 传入 PadChat 服务端地址
 func NewBot(url string) (*Bot, error) {
 	dialer := websocket.DefaultDialer
 	dialer.EnableCompression = true
@@ -153,36 +154,42 @@ func newBot(conn *websocket.Conn) *Bot {
 	}
 }
 
+// OnQRURL 收到二维码回调, 需在执行二维码登录前配置
 func (bot *Bot) OnQRURL(f func(string)) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onQRURL = f
 }
 
+// OnScan 二维码扫描回调
 func (bot *Bot) OnScan(f func(resp ScanResp)) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onScan = f
 }
 
+// OnMsg 微信接收消息回调
 func (bot *Bot) OnMsg(f func(msg Msg)) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onMsg = f
 }
 
+// OnLogin 登录成功回调
 func (bot *Bot) OnLogin(f func()) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onLogin = f
 }
 
+// OnLoaded 联系人加载完成回调
 func (bot *Bot) OnLoaded(f func()) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onLoaded = f
 }
 
+// OnContactSync 联系人同步回调
 func (bot *Bot) OnContactSync(f func(contact Contact)) {
 	bot.Lock()
 	defer bot.Unlock()

@@ -305,7 +305,8 @@ type RequestTokenResp struct {
 }
 
 type RequestUrlResp struct {
-	Status   int    `json:"status"`
-	Message  string `json:"message"`
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	// 完整的访问结果原始数据文本（包含http头数据）
 	Response string `json:"response"`
 }
