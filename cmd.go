@@ -2,7 +2,6 @@ package padchat
 
 import (
 	"errors"
-
 	"time"
 
 	"github.com/google/uuid"
@@ -22,7 +21,7 @@ func (bot *Bot) sendCommand(cmd string, data interface{}) CommandResp {
 	case <-time.After(bot.reqTimeout):
 		bot.retProcMap.Delete(id)
 		close(c)
-		return CommandResp{}
+		return CommandResp{Success: false, Msg: "timeout"}
 	}
 }
 
