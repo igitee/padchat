@@ -3,6 +3,8 @@ package padchat
 import (
 	"errors"
 
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/json-iterator/go"
 )
@@ -14,7 +16,14 @@ func (bot *Bot) sendCommand(cmd string, data interface{}) CommandResp {
 		c <- resp
 	})
 	bot.ws.WriteJSON(WSReq{Type: "user", CMD: cmd, CMDID: id, Data: data})
-	return <-c
+	select {
+	case d := <-c:
+		return d
+	case <-time.After(bot.reqTimeout):
+		bot.retProcMap.Delete(id)
+		close(c)
+		return CommandResp{}
+	}
 }
 
 // Init 执行初始化, 必须在登录前调用

@@ -17,6 +17,7 @@ type Bot struct {
 	sync.RWMutex
 	ws            WSConn
 	retProcMap    *sync.Map
+	reqTimeout    time.Duration
 	onQRURL       func(string)
 	onScan        func(ScanResp)
 	onMsg         func(Msg)
@@ -144,6 +145,7 @@ func newBot(conn *websocket.Conn) *Bot {
 			Mutex: sync.Mutex{},
 			Conn:  conn,
 		},
+		reqTimeout:    time.Second * 30,
 		retProcMap:    &sync.Map{},
 		onQRURL:       func(string) {},
 		onScan:        func(ScanResp) {},
@@ -194,4 +196,8 @@ func (bot *Bot) OnContactSync(f func(contact Contact)) {
 	bot.Lock()
 	defer bot.Unlock()
 	bot.onContactSync = f
+}
+
+func (bot *Bot) SetCommandTimeout(t time.Duration) {
+	bot.reqTimeout = t
 }
