@@ -163,12 +163,21 @@ type QRCodeResp struct {
 }
 
 type ImgResp struct {
-	BigHead   string `json:"big_url"`
-	SmallHead string `json:"small_url"`
+	BigHead   string `json:"big_head"`
+	SmallHead string `json:"small_head"`
 	Status    int    `json:"status"`
 	Size      int    `json:"size"`
 	Message   string `json:"message"`
 	Data      int    `json:"data"`
+}
+
+type SNSUploadResp struct {
+	BigURL   string `json:"big_url"`
+	SmallURL string `json:"small_url"`
+	Status   int    `json:"status"`
+	Size     int    `json:"size"`
+	Message  string `json:"message"`
+	Data     int    `json:"data"`
 }
 
 type Moment struct {
