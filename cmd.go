@@ -621,7 +621,7 @@ func (bot *Bot) SNSUpload(file string) (*ImgResp, error) {
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	data := &ImgResp{}
+	data := &SNSUploadResp{}
 	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err

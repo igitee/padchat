@@ -3,7 +3,6 @@ package padchat
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"strings"
 	"sync"
 	"time"
@@ -29,10 +28,7 @@ type Bot struct {
 // NewBot 乃万物之始
 // 新建 Bot 实例, 传入 PadChat 服务端地址
 func NewBot(url string) (*Bot, error) {
-	dialer := websocket.DefaultDialer
-	dialer.EnableCompression = true
-	dialer.WriteBufferSize = math.MaxInt32
-	conn, _, err := dialer.Dial(url, nil)
+	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -198,6 +194,7 @@ func (bot *Bot) OnContactSync(f func(contact Contact)) {
 	bot.onContactSync = f
 }
 
+// SetCommandTimeout 设置微信指令超时时间, 默认为 30 秒
 func (bot *Bot) SetCommandTimeout(t time.Duration) {
 	bot.reqTimeout = t
 }
