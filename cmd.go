@@ -612,7 +612,7 @@ func (bot *Bot) SetHeadImg(file string) (*ImgResp, error) {
 
 // SNSUpload 上传图片到朋友圈
 // 此接口只能上传图片，并不会将图片发到朋友圈中
-func (bot *Bot) SNSUpload(file string) (*ImgResp, error) {
+func (bot *Bot) SNSUpload(file string) (*SNSUploadResp, error) {
 	resp := bot.sendCommand("snsUpload", struct {
 		File string `json:"file"`
 	}{
