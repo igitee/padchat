@@ -912,7 +912,8 @@ func (bot *Bot) SetLabel(userID string, labelID int) (*MsgAndStatus, error) {
 
 // ReceiveRedPacket 接收红包
 // mType = 49
-func (bot *Bot) ReceiveRedPacket(rawMsgData Msg) (*RedPacketResp, error) {
+// 使用 bytes.Contains(msg.Content, []byte("<![CDATA[微信红包]]>")) 与转账区分
+func (bot *Bot) ReceiveRedPacket(rawMsgData Msg) (*ExternalMsgResp, error) {
 	rawMsgData.Data = ""
 	resp := bot.sendCommand("receiveRedPacket", struct {
 		RawMsgData Msg `json:"rawMsgData"`
@@ -920,7 +921,7 @@ func (bot *Bot) ReceiveRedPacket(rawMsgData Msg) (*RedPacketResp, error) {
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	data := &RedPacketResp{}
+	data := &ExternalMsgResp{}
 	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err
@@ -929,7 +930,7 @@ func (bot *Bot) ReceiveRedPacket(rawMsgData Msg) (*RedPacketResp, error) {
 }
 
 // QueryRedPacket 查看红包信息, 如果是别人发的红包, 未领取且未领取完毕时, 无法取到红包信息
-func (bot *Bot) QueryRedPacket(rawMsgData Msg, index int) (*RedPacketResp, error) {
+func (bot *Bot) QueryRedPacket(rawMsgData Msg, index int) (*ExternalMsgResp, error) {
 	rawMsgData.Data = ""
 	resp := bot.sendCommand("queryRedPacket", struct {
 		RawMsgData Msg `json:"rawMsgData"`
@@ -941,7 +942,7 @@ func (bot *Bot) QueryRedPacket(rawMsgData Msg, index int) (*RedPacketResp, error
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	data := &RedPacketResp{}
+	data := &ExternalMsgResp{}
 	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err
@@ -950,7 +951,7 @@ func (bot *Bot) QueryRedPacket(rawMsgData Msg, index int) (*RedPacketResp, error
 }
 
 // OpenRedPacket 领取红包
-func (bot *Bot) OpenRedPacket(rawMsgData Msg, key string) (*RedPacketResp, error) {
+func (bot *Bot) OpenRedPacket(rawMsgData Msg, key string) (*ExternalMsgResp, error) {
 	rawMsgData.Data = ""
 	resp := bot.sendCommand("openRedPacket", struct {
 		RawMsgData Msg    `json:"rawMsgData"`
@@ -962,7 +963,47 @@ func (bot *Bot) OpenRedPacket(rawMsgData Msg, key string) (*RedPacketResp, error
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
 	}
-	data := &RedPacketResp{}
+	data := &ExternalMsgResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// QueryTransfer 查看转账消息
+func (bot *Bot) QueryTransfer(rawMsgData Msg) (*ExternalMsgResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("queryTransfer", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+	}{
+		RawMsgData: rawMsgData,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &ExternalMsgResp{}
+	err := jsoniter.Unmarshal(resp.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// AcceptTransfer 接受转账
+// mType = 49
+// 使用 bytes.Contains(msg.Content, []byte("<![CDATA[微信转账]]>")) 与红包区分
+func (bot *Bot) AcceptTransfer(rawMsgData Msg) (*ExternalMsgResp, error) {
+	rawMsgData.Data = ""
+	resp := bot.sendCommand("acceptTransfer", struct {
+		RawMsgData Msg `json:"rawMsgData"`
+	}{
+		RawMsgData: rawMsgData,
+	})
+	if !resp.Success {
+		return nil, errors.New(resp.Msg)
+	}
+	data := &ExternalMsgResp{}
 	err := jsoniter.Unmarshal(resp.Data, data)
 	if err != nil {
 		return nil, err

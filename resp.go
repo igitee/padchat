@@ -290,7 +290,7 @@ type LabelListResp struct {
 	Status  int     `json:"status"`
 }
 
-type RedPacketResp struct {
+type ExternalMsgResp struct {
 	External string `json:"external"`
 	Key      string `json:"key"`
 	Message  string `json:"message"`
