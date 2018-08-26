@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strings"
+	"bytes"
 
-	"github.com/mdp/qrterminal"
+	"github.com/Baozisoftware/qrcode-terminal-go"
 	"github.com/tuotoo/padchat"
 )
 
@@ -18,16 +17,36 @@ func main() {
 		panic("init failed")
 	}
 	bot.OnQRURL(func(s string) {
-		qrterminal.Generate(s, qrterminal.H, os.Stdout)
+		obj := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.NormalBlack,
+			qrcodeTerminal.ConsoleColors.BrightWhite,
+			qrcodeTerminal.QRCodeRecoveryLevels.Low)
+		obj.Get([]byte(s)).Print()
 	})
-	data := bot.QRLogin()
-	fmt.Printf("login resp data: %+v\n", data)
+	bot.QRLogin()
 	bot.OnLogin(func() {
-		fmt.Println(string(bot.SyncContact().Data))
+		fmt.Println("login success")
 	})
 	bot.OnMsg(func(msg padchat.Msg) {
-		fmt.Printf("%+v\n", msg)
-		fmt.Println(strings.Repeat("=", 100))
+		fmt.Println(msg.MType, msg.FromUser, msg.ToUser)
+		if msg.MType == 49 {
+			if bytes.Contains(msg.Content, []byte("<![CDATA[微信红包]]>")) {
+				rec, err := bot.ReceiveRedPacket(msg)
+				if err != nil {
+					fmt.Println("receive red packet", err)
+					return
+				}
+				fmt.Println(bot.OpenRedPacket(msg, rec.Key))
+			} else if bytes.Contains(msg.Content, []byte("<![CDATA[微信转账]]>")) {
+				rec, err := bot.QueryTransfer(msg)
+				if err != nil {
+					fmt.Println("query tranfer", err)
+					return
+				}
+				fmt.Println("query success", rec)
+				fmt.Println("accept transfer")
+				fmt.Println(bot.AcceptTransfer(msg))
+			}
+		}
 	})
 	select {}
 }

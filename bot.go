@@ -43,7 +43,9 @@ func NewBot(url string) (*Bot, error) {
 	}
 	bot := newBot(conn)
 	go func() {
-		for range time.Tick(time.Millisecond * 500) {
+		ticker := time.NewTicker(time.Millisecond * 500)
+		defer ticker.Stop()
+		for range ticker.C {
 			data := &ServerData{}
 			conn.ReadJSON(data)
 			switch data.Type {
