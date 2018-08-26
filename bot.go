@@ -34,10 +34,10 @@ func NewBot(url string) (*Bot, error) {
 	}
 	err = conn.WriteJSON(struct {
 		Type  string      `json:"type"`
-		CMD   string      `json:"cmd"`
-		CMDID string      `json:"cmdId"`
+		Cmd   string      `json:"cmd"`
+		CmdID string      `json:"cmdId"`
 		Data  interface{} `json:"data"`
-	}{Type: "user", CMD: "init", CMDID: uuid.New().String()})
+	}{Type: "user", Cmd: "init", CmdID: uuid.New().String()})
 	if err != nil {
 		return nil, err
 	}

@@ -2,8 +2,8 @@ package padchat
 
 type WSReq struct {
 	Type  string      `json:"type"`
-	CMD   string      `json:"cmd"`
-	CMDID string      `json:"cmdId"`
+	Cmd   string      `json:"cmd"`
+	CmdID string      `json:"cmdId"`
 	Data  interface{} `json:"data"`
 }
 

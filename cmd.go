@@ -2,6 +2,8 @@ package padchat
 
 import (
 	"errors"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,7 +16,7 @@ func (bot *Bot) sendCommand(cmd string, data interface{}) CommandResp {
 	bot.retProcMap.Store(id, func(resp CommandResp) {
 		c <- resp
 	})
-	bot.ws.WriteJSON(WSReq{Type: "user", CMD: cmd, CMDID: id, Data: data})
+	bot.ws.WriteJSON(WSReq{Type: "user", Cmd: cmd, CmdID: id, Data: data})
 	select {
 	case d := <-c:
 		return d
@@ -140,8 +142,9 @@ func (bot *Bot) SyncContact() CommandResp {
 }
 
 // SendMsg 发送文字信息
-func (bot *Bot) SendMsg(req SendMsgReq) (*SendMsgResp, error) {
+func (bot *Bot) SendMsg(req *SendMsgReq) (*SendMsgResp, error) {
 	data := &SendMsgResp{}
+	MkAtContent(req)
 	resp := bot.sendCommand("sendMsg", req)
 	if !resp.Success {
 		return nil, errors.New(resp.Msg)
@@ -151,6 +154,19 @@ func (bot *Bot) SendMsg(req SendMsgReq) (*SendMsgResp, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+// MkAtContent prefix 'at' symbol for req content if necessary
+func MkAtContent(req *SendMsgReq) {
+	if len(req.AtList) > 0 {
+		arr := regexp.MustCompile(`@`).
+			FindAllString(req.Content, -1)
+		sub := len(req.AtList) - len(arr)
+		if sub > 0 {
+			req.Content = strings.Repeat("@", sub) +
+				"\n" + req.Content
+		}
+	}
 }
 
 // ShareCard 分享名片

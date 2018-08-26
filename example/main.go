@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 
 	"github.com/Baozisoftware/qrcode-terminal-go"
 	"github.com/tuotoo/padchat"
