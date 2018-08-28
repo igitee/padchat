@@ -68,6 +68,11 @@ func NewBot(url string) (*Bot, error) {
 	return bot, nil
 }
 
+// OnClose ws 断开回调
+func (bot *Bot) OnClose(f func(code int, text string) error) {
+	bot.ws.SetCloseHandler(f)
+}
+
 func (bot *Bot) processUserEvent(data *ServerData) {
 	switch data.Event {
 	case "qrcode":
