@@ -45,6 +45,7 @@ func NewBot(url string) (*Bot, error) {
 	go func() {
 		ticker := time.NewTicker(time.Millisecond * 500)
 		defer ticker.Stop()
+		var emptyCount int
 		for range ticker.C {
 			data := &ServerData{}
 			conn.ReadJSON(data)
@@ -59,6 +60,13 @@ func NewBot(url string) (*Bot, error) {
 					proc.(func(CommandResp))(resp)
 				}
 				bot.retProcMap.Delete(data.CMDID)
+			case "":
+				emptyCount++
+				if emptyCount > 10 {
+					bot.ws.Close()
+					bot.ws.CloseHandler()(503, "got empty event from server")
+					return
+				}
 			default:
 				fmt.Println(data.Type, data.Event, string(data.Data))
 				fmt.Println(strings.Repeat("*", 100))
