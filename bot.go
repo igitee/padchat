@@ -1,7 +1,6 @@
 package padchat
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -24,6 +23,7 @@ type Bot struct {
 	onLogin       func()
 	onLoaded      func()
 	onContactSync func(Contact)
+	onWarn        func(string)
 }
 
 // NewBot 乃万物之始
@@ -46,6 +46,7 @@ func NewBot(url string) (*Bot, error) {
 	go func() {
 		ticker := time.NewTicker(time.Millisecond * 500)
 		defer ticker.Stop()
+		var emptyCount int
 		for range ticker.C {
 			data := &ServerData{}
 			conn.ReadJSON(data)
@@ -56,13 +57,15 @@ func NewBot(url string) (*Bot, error) {
 				proc, ok := bot.retProcMap.Load(data.CMDID)
 				if ok {
 					var resp CommandResp
-					json.Unmarshal(data.Data, &resp)
+					jsoniter.Unmarshal(data.Data, &resp)
 					proc.(func(CommandResp))(resp)
 				}
 				bot.retProcMap.Delete(data.CMDID)
 			case "":
-				bot.ws.Close()
-				bot.ws.CloseHandler()(503, "got empty event from server")
+				emptyCount++
+				if emptyCount > 10 {
+					bot.onWarn("empty event from server")
+				}
 			default:
 				fmt.Println(data.Type, data.Event, string(data.Data))
 				fmt.Println(strings.Repeat("*", 100))
@@ -83,7 +86,7 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 		url := &struct {
 			URL string
 		}{}
-		json.Unmarshal(data.Data, url)
+		jsoniter.Unmarshal(data.Data, url)
 		go func() {
 			bot.RLock()
 			defer bot.RUnlock()
@@ -91,7 +94,7 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 		}()
 	case "scan":
 		var scan ScanResp
-		json.Unmarshal(data.Data, &scan)
+		jsoniter.Unmarshal(data.Data, &scan)
 		go func() {
 			bot.RLock()
 			defer bot.RUnlock()
@@ -144,9 +147,11 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 		bot.ws.Close()
 		bot.ws.CloseHandler()(501, "logout from server")
 	case "warn":
-		log.Println("warn", string(data.Data))
-		bot.ws.Close()
-		bot.ws.CloseHandler()(502, "got warning from server")
+		err := &struct {
+			Error string
+		}{}
+		jsoniter.Unmarshal(data.Data, err)
+		bot.onWarn(err.Error)
 	default:
 		fmt.Println(data.Event, string(data.Data))
 		fmt.Println(strings.Repeat("~", 100))
@@ -216,4 +221,13 @@ func (bot *Bot) OnContactSync(f func(contact Contact)) {
 // SetCommandTimeout 设置微信指令超时时间, 默认为 30 秒
 func (bot *Bot) SetCommandTimeout(t time.Duration) {
 	bot.reqTimeout = t
+}
+
+func (bot *Bot) OnWarn(f func(err string)) {
+	bot.onWarn = f
+}
+
+func (bot *Bot) CloseWS() {
+	bot.ws.Close()
+	bot.ws.CloseHandler()(500, "close ws")
 }
