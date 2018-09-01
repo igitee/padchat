@@ -59,12 +59,6 @@ func NewBot(url string) (*Bot, error) {
 					proc.(func(CommandResp))(resp)
 				}
 				bot.retProcMap.Delete(data.CMDID)
-			case "logout":
-				bot.ws.Close()
-				bot.ws.CloseHandler()(501, "logout from server")
-			case "warn":
-				bot.ws.Close()
-				bot.ws.CloseHandler()(502, "got warning from server")
 			case "":
 				bot.ws.Close()
 				bot.ws.CloseHandler()(503, "got empty event from server")
@@ -144,6 +138,12 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 			defer bot.RUnlock()
 			bot.onLoaded()
 		}()
+	case "logout":
+		bot.ws.Close()
+		bot.ws.CloseHandler()(501, "logout from server")
+	case "warn":
+		bot.ws.Close()
+		bot.ws.CloseHandler()(502, "got warning from server")
 	default:
 		fmt.Println(data.Event, string(data.Data))
 		fmt.Println(strings.Repeat("~", 100))
