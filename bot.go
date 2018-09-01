@@ -3,6 +3,7 @@ package padchat
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -139,9 +140,11 @@ func (bot *Bot) processUserEvent(data *ServerData) {
 			bot.onLoaded()
 		}()
 	case "logout":
+		log.Println("logout", string(data.Data))
 		bot.ws.Close()
 		bot.ws.CloseHandler()(501, "logout from server")
 	case "warn":
+		log.Println("warn", string(data.Data))
 		bot.ws.Close()
 		bot.ws.CloseHandler()(502, "got warning from server")
 	default:
